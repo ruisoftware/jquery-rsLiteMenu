@@ -1,0 +1,8 @@
+#horizMenu > li,
+#horizMenuEffects > li {
+    float: left;
+    list-style: none;
+    margin-left: 10px;
+    border: 1px dotted black;
+    background-color: Orange;
+}
