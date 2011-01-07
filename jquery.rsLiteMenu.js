@@ -47,6 +47,18 @@
 */
 (function ($) {
     $.fn.rsLiteMenu = function (options) {
+        
+        if (!Array.prototype.indexOf) { // IE does not support indexOf(), so implement it. Other browsers will use the native indexOf()
+            Array.prototype.indexOf = function (obj, start) {
+                for (var i = (start || 0); i < this.length; i++) {
+                    if (this[i] === obj) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+        }
+
         var openSubMenus = {
             stackObjs: [],      // stack of DOM elements that need to appear/disappear
             stackHidden: [],    // stack of booleans that specify if the DOM element (from stackObjs at same index) should be hidden during pop
