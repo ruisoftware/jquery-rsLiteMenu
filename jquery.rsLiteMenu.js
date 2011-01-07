@@ -47,18 +47,84 @@
 */
 (function ($) {
     $.fn.rsLiteMenu = function (options) {
+        var openSubMenus = {
+            stackObjs: [],      // stack of DOM elements that need to appear/disappear
+            stackHidden: [],    // stack of booleans that specify if the DOM element (from stackObjs at same index) should be hidden during pop
+
+            push: function (element, hidden) {
+                this.stackObjs.push(element);
+                this.stackHidden.push(hidden);
+            },
+
+            pop: function () {
+                if (this.stackObjs.length == 0) {
+                    return null;
+                } else {
+                    this.stackHidden.pop();
+                    return this.stackObjs.pop();
+                }
+            },
+
+            setVisible: function (element) {
+                var index = this.stackObjs.indexOf(element);
+                if (index == -1) {
+                    // the element does not exist in the stack: push it and display it
+                    this.push(element, false);
+                    defaults.onShowSubmenu($(element));
+                } else {
+                    // the element already exists in the stack: just update the flag to be visible
+                    this.stackHidden[index] = false;
+                }
+            },
+
+            setHidden: function (element) {
+                var index = this.stackObjs.indexOf(element);
+                if (index > -1) {
+                    // flag this element to be hidden
+                    this.stackHidden[index] = true;
+                    // if this is top element in stack, then...
+                    if (index == this.stackObjs.length - 1) {
+                        // ... hide it and pop it. Keep hiding and poping the top stack elements as long as they are flagged to hidden
+                        while (index > -1 && this.stackHidden[index]) {
+                            defaults.onHideSubmenu($(this.stackObjs[index--]));
+                            this.pop();
+                        }
+                    }
+                }
+            }
+        };
 
         // defaults input parameters
         var defaults = {
-    
-            // invoked when mouse enters a parent element
-            onShowSubmenu: function (parent) {
-                $(parent).children().show();       // show immediate children
+
+            // invoked when a UL or OL elements needs to become visible (when the mouse enters the area)
+            onShowSubmenu: function (element) {
+                element.show();
             },
 
-            // invoked when mouse leaves a parent element
-            onHideSubmenu: function (parent) {
-                $("ul, ol", parent).hide();        // hide all descendants
+            // invoked when a UL or OL elements needs to become hidden (when the mouse leaves the area)
+            onHideSubmenu: function (element) {
+                element.hide();
+            }
+        },
+
+        showSubMenuFromLI = function (liElement) {
+            // get the UL or OL children of this LI
+            var ulOlElements = $("ul, ol", liElement);
+            if (ulOlElements.length > 0) {
+                openSubMenus.setVisible(ulOlElements.first()[0]);
+            }
+        },
+
+        hideSubMenuFromULorOL = function (ulOlElement) {
+            openSubMenus.setHidden(ulOlElement);
+        },
+
+        hideSubMenuFromLI = function (liElement) {
+            // get the UL or OL children of this LI
+            var ulOlElements = $("ul, ol", liElement);
+            if (ulOlElements.length > 0) {
+                hideSubMenuFromULorOL(ulOlElements.first()[0]);
             }
         };
 
@@ -70,12 +136,15 @@
                 $.extend(defaults, options);
             }
 
-            $("ul, ol", menuCtrl).hide();
+            // initially we want only the top level LI to be visible, all the other submenus are hidden
+            $("ul, ol", menuCtrl).hide().mouseleave(function () {
+                hideSubMenuFromULorOL(this);
+            });
 
             $("li", menuCtrl).mouseenter(function () {
-                defaults.onShowSubmenu(this);
+                showSubMenuFromLI(this);
             }).mouseleave(function () {
-                defaults.onHideSubmenu(this);
+                hideSubMenuFromLI(this);
             });
         });
     };
