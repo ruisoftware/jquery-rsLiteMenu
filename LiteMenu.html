@@ -14,11 +14,11 @@
 
                 // horizMenuEffects has a customize show/hide effect
                 $("#horizMenuEffects").rsLiteMenu({
-                    onShowSubmenu: function(parent) {
-                        $(parent).children().show('fast');
+                    onShowSubmenu: function(element) {
+                        element.show('fast');
                     },
-                    onHideSubmenu: function (parent) {
-                        $("ul, ol", parent).hide('slow');
+                    onHideSubmenu: function (element) {
+                        element.hide('slow');
                     }
                 });
         }
