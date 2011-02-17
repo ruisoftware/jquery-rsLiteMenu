@@ -59,7 +59,8 @@
             }
         }
 
-        var openSubMenus = {
+        var opts = $.extend({}, $.fn.rsLiteMenu.defaults, options),
+            openSubMenus = {
             stackObjs: [],      // stack of DOM elements that need to appear/disappear
             stackHidden: [],    // stack of booleans that specify if the DOM element (from stackObjs at same index) should be hidden during pop
 
@@ -82,7 +83,7 @@
                 if (index == -1) {
                     // the element does not exist in the stack: push it and display it
                     this.push(element, false);
-                    defaults.onShowSubmenu($(element));
+                    opts.onShowSubmenu($(element));
                 } else {
                     // the element already exists in the stack: just update the flag to be visible
                     this.stackHidden[index] = false;
@@ -98,25 +99,11 @@
                     if (index == this.stackObjs.length - 1) {
                         // ... hide it and pop it. Keep hiding and poping the top stack elements as long as they are flagged to hidden
                         while (index > -1 && this.stackHidden[index]) {
-                            defaults.onHideSubmenu($(this.stackObjs[index--]));
+                            opts.onHideSubmenu($(this.stackObjs[index--]));
                             this.pop();
                         }
                     }
                 }
-            }
-        };
-
-        // defaults input parameters
-        var defaults = {
-
-            // invoked when a UL or OL elements needs to become visible (when the mouse enters the area)
-            onShowSubmenu: function (element) {
-                element.show();
-            },
-
-            // invoked when a UL or OL elements needs to become hidden (when the mouse leaves the area)
-            onHideSubmenu: function (element) {
-                element.hide();
             }
         },
 
@@ -143,11 +130,6 @@
         return this.each(function () {
             var menuCtrl = $(this);
 
-            // if options is not empty, then merge with the default settings
-            if (options) {
-                $.extend(defaults, options);
-            }
-
             // initially we want only the top level LI to be visible, all the other submenus are hidden
             $("ul, ol", menuCtrl).hide().mouseleave(function () {
                 hideSubMenuFromULorOL(this);
@@ -160,4 +142,19 @@
             });
         });
     };
+
+    // public access to the default input parameters
+    $.fn.rsLiteMenu.defaults = {
+
+        // invoked when a UL or OL elements needs to become visible (when the mouse enters the area)
+        onShowSubmenu: function (element) {
+            element.show();
+        },
+
+        // invoked when a UL or OL elements needs to become hidden (when the mouse leaves the area)
+        onHideSubmenu: function (element) {
+            element.hide();
+        }
+    };
+
 })(jQuery);
