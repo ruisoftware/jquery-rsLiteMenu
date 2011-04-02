@@ -1,8 +1,40 @@
-#horizMenu > li,
-#horizMenuEffects > li {
-    float: left;
+h1 {
+    margin-top: 100px;
+    margin-bottom: 0px;
+    clear: left;
+}
+
+div {
+    clear: left;
+}
+
+ul {
+    padding: 0px 10px;
+}
+
+li {
     list-style: none;
+}
+
+#horizMenu > li,
+#horizMenuEffects > li,
+#menuOnlyTops > li,
+#menuFloat > li {
+    float: left;
     margin-left: 10px;
     border: 1px dotted black;
     background-color: Orange;
+}
+
+li.fixedmenu {
+    position: relative;
+}
+
+li.fixedmenu ul {
+    position: absolute;
+    border: 1px dotted black;
+    background-color: Orange;
+    left: 40px;
+    top: 10px;
+    z-index: 10;
 }

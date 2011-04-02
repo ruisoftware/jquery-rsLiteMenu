@@ -18,7 +18,8 @@
 * ================ =============  ===============================================================================================
 * onShowSubmenu                   Override this parameter to specify a custom behavior when a submenu (children of UL or OL elements need to show)
 * onHideSubmenu                   Override this parameter to specify a custom behavior when a submenu (all children of UL or OL elements need to hide)
-*
+* hideOnlyTopSubMenus   false     If true, only the 1st level submenus are hidden when the mouse leaves their submenu area.
+*                                 If false, all submenus are hidden (regardeless of their deepness level) when the mouse leaves their submenu area.
 * 
 * Usage with default values:
 * ==========================
@@ -47,7 +48,7 @@
 */
 (function ($) {
     $.fn.rsLiteMenu = function (options) {
-        
+
         if (!Array.prototype.indexOf) { // IE does not support indexOf(), so implement it. Other browsers will use the native indexOf()
             Array.prototype.indexOf = function (obj, start) {
                 for (var i = (start || 0); i < this.length; i++) {
@@ -60,85 +61,99 @@
         }
 
         var opts = $.extend({}, $.fn.rsLiteMenu.defaults, options),
-            openSubMenus = {
-            stackObjs: [],      // stack of DOM elements that need to appear/disappear
-            stackHidden: [],    // stack of booleans that specify if the DOM element (from stackObjs at same index) should be hidden during pop
+            subMenuManager = {
+                stackObjs: [],      // stack of DOM elements that need to appear/disappear
+                stackHidden: [],    // stack of booleans that specify if the DOM element (from stackObjs at same index) should be hidden during pop
 
-            push: function (element, hidden) {
-                this.stackObjs.push(element);
-                this.stackHidden.push(hidden);
-            },
+                push: function (element, hidden) {
+                    this.stackObjs.push(element);
+                    this.stackHidden.push(hidden);
+                },
 
-            pop: function () {
-                if (this.stackObjs.length == 0) {
-                    return null;
-                } else {
-                    this.stackHidden.pop();
-                    return this.stackObjs.pop();
-                }
-            },
+                pop: function () {
+                    if (this.stackObjs.length == 0) {
+                        return null;
+                    } else {
+                        this.stackHidden.pop();
+                        return this.stackObjs.pop();
+                    }
+                },
 
-            setVisible: function (element) {
-                var index = this.stackObjs.indexOf(element);
-                if (index == -1) {
-                    // the element does not exist in the stack: push it and display it
-                    this.push(element, false);
-                    opts.onShowSubmenu($(element));
-                } else {
-                    // the element already exists in the stack: just update the flag to be visible
-                    this.stackHidden[index] = false;
-                }
-            },
+                setVisible: function (element) {
+                    var index = this.stackObjs.indexOf(element);
+                    if (index == -1) {
+                        // the element does not exist in the stack: push it and display it
+                        this.push(element, false);
+                        opts.onShowSubmenu($(element));
+                    } else {
+                        // the element already exists in the stack: just update the flag to be visible
+                        this.stackHidden[index] = false;
+                    }
+                },
 
-            setHidden: function (element) {
-                var index = this.stackObjs.indexOf(element);
-                if (index > -1) {
-                    // flag this element to be hidden
-                    this.stackHidden[index] = true;
-                    // if this is top element in stack, then...
-                    if (index == this.stackObjs.length - 1) {
-                        // ... hide it and pop it. Keep hiding and poping the top stack elements as long as they are flagged to hidden
-                        while (index > -1 && this.stackHidden[index]) {
+                setHidden: function (element) {
+                    var index = this.stackObjs.indexOf(element);
+                    if (index > -1) {
+                        // flag this element to be hidden
+                        this.stackHidden[index] = true;
+                        // if this is top element in stack, then...
+                        if (index == this.stackObjs.length - 1) {
+                            // ... hide it and pop it. Keep hiding and poping the top stack elements as long as they are flagged to hidden
+                            while (index > -1 && this.stackHidden[index]) {
+                                opts.onHideSubmenu($(this.stackObjs[index--]));
+                                this.pop();
+                            }
+                        }
+                    }
+                },
+
+                setHiddenAll: function (element) {
+                    var index = this.stackObjs.indexOf(element);
+                    if (index > -1) {
+                        index = this.stackObjs.length - 1;
+                        while (index > -1) {
                             opts.onHideSubmenu($(this.stackObjs[index--]));
                             this.pop();
                         }
                     }
                 }
+
+            },
+
+        showSubMenu = function ($liElement) {
+            // get the UL or OL children of this LI
+            var $ulOlElements = $liElement.children("ul, ol");
+            if ($ulOlElements.length > 0) {
+                subMenuManager.setVisible($ulOlElements[0]);
             }
         },
 
-        showSubMenuFromLI = function (liElement) {
+        hideSubMenu = function ($liElement, $topLists) {
             // get the UL or OL children of this LI
-            var ulOlElements = $("ul, ol", liElement);
-            if (ulOlElements.length > 0) {
-                openSubMenus.setVisible(ulOlElements.first()[0]);
-            }
-        },
-
-        hideSubMenuFromULorOL = function (ulOlElement) {
-            openSubMenus.setHidden(ulOlElement);
-        },
-
-        hideSubMenuFromLI = function (liElement) {
-            // get the UL or OL children of this LI
-            var ulOlElements = $("ul, ol", liElement);
-            if (ulOlElements.length > 0) {
-                hideSubMenuFromULorOL(ulOlElements.first()[0]);
+            var $ulOlElements = $liElement.children("ul, ol");
+            if ($ulOlElements.length > 0) {
+                // should only hide the topmost lists?
+                if (opts.hideOnlyTopSubMenus) {
+                    // if yes, then check if the given $liElement contains a topmost list
+                    if ($topLists.filter($liElement.children("ul, ol")).length > 0) {
+                        subMenuManager.setHiddenAll($ulOlElements[0]);
+                    }
+                } else {
+                    subMenuManager.setHidden($ulOlElements[0]);
+                }
             }
         };
 
         return this.each(function () {
-            var menuCtrl = $(this);
+            var $menuCtrl = $(this);
 
             // initially we want only the top level LI to be visible, all the other submenus are hidden
-            $("ul, ol", menuCtrl).hide().mouseleave(function () {
-                hideSubMenuFromULorOL(this);
-            });
+            $("ul, ol", $menuCtrl).hide();
 
-            $("li", menuCtrl).mouseenter(function () {
-                showSubMenuFromLI(this);
+            $("li:has(ul,ol)", $menuCtrl).mouseenter(function () {
+                showSubMenu($(this));
             }).mouseleave(function () {
-                hideSubMenuFromLI(this);
+                hideSubMenu($(this), $menuCtrl.children("li").children("ul, ol"));
             });
         });
     };
@@ -154,7 +169,11 @@
         // invoked when a UL or OL elements needs to become hidden (when the mouse leaves the area)
         onHideSubmenu: function (element) {
             element.hide();
-        }
+        },
+
+        // If true, only the 1st level submenus are hidden when the mouse leaves their submenu area.
+        // If false, all submenus are hidden (regardeless of their deepness level) when the mouse leaves their submenu area.
+        hideOnlyTopSubMenus: false
     };
 
 })(jQuery);
