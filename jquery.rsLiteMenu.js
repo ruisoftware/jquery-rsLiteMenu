@@ -48,18 +48,6 @@
 */
 (function ($) {
     $.fn.rsLiteMenu = function (options) {
-
-        if (!Array.prototype.indexOf) { // IE does not support indexOf(), so implement it. Other browsers will use the native indexOf()
-            Array.prototype.indexOf = function (obj, start) {
-                for (var i = (start || 0); i < this.length; i++) {
-                    if (this[i] === obj) {
-                        return i;
-                    }
-                }
-                return -1;
-            }
-        }
-
         var opts = $.extend({}, $.fn.rsLiteMenu.defaults, options),
             subMenuManager = {
                 stackObjs: [],      // stack of DOM elements that need to appear/disappear
@@ -80,7 +68,7 @@
                 },
 
                 setVisible: function (element) {
-                    var index = this.stackObjs.indexOf(element);
+                    var index = $.inArray(element, this.stackObjs);
                     if (index == -1) {
                         // the element does not exist in the stack: push it and display it
                         this.push(element, false);
@@ -92,7 +80,7 @@
                 },
 
                 setHidden: function (element) {
-                    var index = this.stackObjs.indexOf(element);
+                    var index = $.inArray(element, this.stackObjs);
                     if (index > -1) {
                         // flag this element to be hidden
                         this.stackHidden[index] = true;
@@ -108,7 +96,7 @@
                 },
 
                 setHiddenAll: function (element) {
-                    var index = this.stackObjs.indexOf(element);
+                    var index = $.inArray(element, this.stackObjs);
                     if (index > -1) {
                         index = this.stackObjs.length - 1;
                         while (index > -1) {
