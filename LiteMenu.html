@@ -3,37 +3,35 @@
   <head>
     <title>jQuery liteMenu plug-in by RuiSofware.com</title>
     <link href="liteMenu.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="jquery-1.4.4.min.js"></script>
-    <script type="text/javascript" src="jquery.rsLiteMenu.js"></script>
-    <script type="text/javascript">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js" ></script>
+    <script src="jquery.rsLiteMenu.min.js"></script>
+    <script>
         // load the plugin when page and DOM are fully loaded:
-        $(document).ready(
-            function () {
-                // verticalMenu and horizMenu use the standard show/hide behavior
-                $("#verticalMenu, #horizMenu").rsLiteMenu();
+        $(document).ready(function () {
+            // verticalMenu and horizMenu use the standard show/hide behavior
+            $("#verticalMenu, #horizMenu").rsLiteMenu();
 
-                // horizMenuEffects has a customize show/hide effect
-                $("#horizMenuEffects, #menuFloat").rsLiteMenu({
-                    onShowSubmenu: function (element) {
-                        element.show();
-                    },
-                    onHideSubmenu: function (element) {
-                        element.hide('slow');
-                    }
-                });
+            // horizMenuEffects has a customize show/hide effect
+            $("#horizMenuEffects, #menuFloat").rsLiteMenu({
+                onShowSubmenu: function (element) {
+                    element.show();
+                },
+                onHideSubmenu: function (element) {
+                    element.hide('slow');
+                }
+            });
 
-                // menuOnlyTops has a customize show/hide effect and only hides the topmost submenus
-                $("#menuOnlyTops").rsLiteMenu({
-                    onShowSubmenu: function (element) {
-                        element.show();
-                    },
-                    onHideSubmenu: function (element) {
-                        element.hide('slow');
-                    },
-                    hideOnlyTopSubMenus: true
-                });
-            }
-        );
+            // menuOnlyTops has a customize show/hide effect and only hides the topmost submenus
+            $("#menuOnlyTops").rsLiteMenu({
+                onShowSubmenu: function (element) {
+                    element.show();
+                },
+                onHideSubmenu: function (element) {
+                    element.hide('slow');
+                },
+                hideOnlyTopSubMenus: true
+            });
+        });
     </script>
   </head>
   <body>
@@ -71,7 +69,7 @@
                 <ul>
                     <li><a href="#">About Me</a></li>
                     <li><a href="#">About We</a></li>
-                    <li><a href="#">About They</a></li>
+                    <li><a href="#">About Them</a></li>
                 </ul>
             </li>
         </ul>
@@ -105,7 +103,7 @@
                 <ul>
                     <li><a href="#">About Me</a></li>
                     <li><a href="#">About We</a></li>
-                    <li><a href="#">About They</a></li>
+                    <li><a href="#">About Them</a></li>
                 </ul>
             </li>
         </ul>
@@ -139,7 +137,7 @@
                 <ul>
                     <li><a href="#">About Me</a></li>
                     <li><a href="#">About We</a></li>
-                    <li><a href="#">About They</a></li>
+                    <li><a href="#">About Them</a></li>
                 </ul>
             </li>
         </ul>
@@ -179,7 +177,7 @@
                 <ul>
                     <li><a href="#">About Me</a></li>
                     <li><a href="#">About We</a></li>
-                    <li><a href="#">About They</a></li>
+                    <li><a href="#">About Them</a></li>
                 </ul>
             </li>
         </ul>
@@ -218,7 +216,7 @@
                 <ul>
                     <li><a href="#">About Me</a></li>
                     <li><a href="#">About We</a></li>
-                    <li><a href="#">About They</a></li>
+                    <li><a href="#">About Them</a></li>
                 </ul>
             </li>
         </ul>
