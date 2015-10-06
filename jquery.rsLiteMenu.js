@@ -50,13 +50,14 @@
 *             Usage:  $e.rsLiteMenu('destroy')
 */
 (function ($) {
+    'use strict';
     var LiteMenuClass = function ($elem, opts) {
-        var $topSubmenus = $elem.children("li").children("ul, ol"),
+        var $topSubmenus = $elem.children('li').children('ul, ol'),
             init = function () {
                 // initially we want only the top level LI to be visible, all the other submenus are hidden
-                $("ul, ol", $elem).hide();
+                $('ul, ol', $elem).hide();
 
-                $("li:has(ul,ol)", $elem).
+                $('li:has(ul,ol)', $elem).
                     bind('mouseenter.rsLiteMenu', onMouseEnter).
                     bind('mouseleave.rsLiteMenu', onMouseLeave);
                 $elem.bind('destroy.rsLiteMenu', onDestroy);
@@ -77,7 +78,7 @@
                 },
 
                 pop: function () {
-                    if (this.stackObjs.length == 0) {
+                    if (this.stackObjs.length === 0) {
                         return null;
                     } else {
                         this.stackHidden.pop();
@@ -137,7 +138,7 @@
 
             showSubMenu = function ($liElement) {
                 // get the UL or OL children of this LI
-                var $ulOlElements = $liElement.children("ul, ol");
+                var $ulOlElements = $liElement.children('ul, ol');
                 if ($ulOlElements.length > 0) {
                     subMenuManager.setVisible($ulOlElements.eq(0));
                 }
@@ -145,12 +146,12 @@
 
             hideSubMenu = function ($liElement) {
                 // get the UL or OL children of this LI
-                var $ulOlElements = $liElement.children("ul, ol");
+                var $ulOlElements = $liElement.children('ul, ol');
                 if ($ulOlElements.length > 0) {
                     // should only hide the topmost lists?
                     if (opts.hideOnlyTopSubMenus) {
                         // if yes, then check if the given $liElement contains a topmost list
-                        if ($topSubmenus.filter($liElement.children("ul, ol")).length > 0) {
+                        if ($topSubmenus.filter($liElement.children('ul, ol')).length > 0) {
                             subMenuManager.setHiddenAll($ulOlElements[0]);
                         }
                     } else {
@@ -160,7 +161,7 @@
             },
 
             onDestroy = function () {
-                $("li:has(ul,ol)", $elem).
+                $('li:has(ul,ol)', $elem).
                     unbind('mouseenter.rsLiteMenu', onMouseEnter).
                     unbind('mouseleave.rsLiteMenu', onMouseLeave);
                 $elem.unbind('destroy.rsLiteMenu', onDestroy);
@@ -173,7 +174,6 @@
             this.trigger('destroy.rsLiteMenu');
         };
         if (typeof options === 'string') {
-            var otherArgs = Array.prototype.slice.call(arguments, 1);
             switch (options) {
                 case 'destroy': return destroy.call(this);
                 default: return this;
